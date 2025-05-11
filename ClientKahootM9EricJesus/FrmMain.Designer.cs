@@ -1,6 +1,6 @@
 ﻿namespace ClientKahootM9EricJesus
 {
-    partial class Form1
+    partial class FrmMain
     {
         /// <summary>
         /// Variable del diseñador necesaria.
@@ -28,13 +28,35 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
+            this.btEscoltar = new System.Windows.Forms.Button();
+            this.SuspendLayout();
+            // 
+            // btEscoltar
+            // 
+            this.btEscoltar.Location = new System.Drawing.Point(344, 342);
+            this.btEscoltar.Name = "btEscoltar";
+            this.btEscoltar.Size = new System.Drawing.Size(82, 37);
+            this.btEscoltar.TabIndex = 0;
+            this.btEscoltar.Text = "CONNECTAR";
+            this.btEscoltar.UseVisualStyleBackColor = true;
+            this.btEscoltar.Click += new System.EventHandler(this.btEscoltar_Click);
+            // 
+            // FrmMain
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btEscoltar);
+            this.Name = "FrmMain";
             this.Text = "Form1";
+            this.Load += new System.EventHandler(this.FrmMain_Load);
+            this.ResumeLayout(false);
+
         }
 
         #endregion
+
+        private System.Windows.Forms.Button btEscoltar;
     }
 }
 
