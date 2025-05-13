@@ -16,8 +16,14 @@ namespace ClientKahootM9EricJesus
     {
         ClXerraire xerraire;
         ClXafarder xafarder;
+        ClSocket socket;
+        public string nick;
 
-        int portEscolta = 6001;
+        int portEscolta = 5555;
+        public int numResposta = 0;
+        int nSegons = 0;
+
+        Timer tm;
 
         public FrmMain()
         {
@@ -26,12 +32,46 @@ namespace ClientKahootM9EricJesus
 
         private void btEscoltar_Click(object sender, EventArgs e)
         {
-
+            nick = tbNick.Text;
+            socket = new ClSocket(this,tbIp.Text,portEscolta);
         }
 
         private void FrmMain_Load(object sender, EventArgs e)
         {
+            xafarder = new ClXafarder(this,portEscolta);
+            xafarder.MissatgeRebut += (missatge) =>
+            {
+                this.Invoke(new Action(() => comencarPartida(missatge)));
+            };
+
+        }
+
+        private void comencarPartida(string missatge)
+        {
+            lbIp.Visible = false;
+            tbIp.Visible = false;
+            btEscoltar.Visible = false;
+
+            lbEsperant.Visible = true;
+            iniTimer();
+        }
+
+        private void iniTimer()
+        {
+            tm = new Timer();
             
         }
+
+        private void segonsPasats()
+        {
+            nSegons++;
+            if (nSegons == 10) mostrarPreguntas();
+        }
+
+        private void mostrarPreguntas()
+        {
+
+        }
+        
     }
 }

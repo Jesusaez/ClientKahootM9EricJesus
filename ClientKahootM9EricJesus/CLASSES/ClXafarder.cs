@@ -1,53 +1,98 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Net;
 using System.Net.Sockets;
+using System.Security;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace ClientKahootM9EricJesus.CLASSES
 {
     internal class ClXafarder
     {
-        Thread ThXafarder;
-        int port;
-        const Int32 MAX_BUFFER = 4096;
+        private Thread ThXafarder;
+        private int port;
+        private const int MAX_BUFFER = 4096;
+        Boolean conectado = false;
 
+        private TcpListener xafarder;
+        private TcpClient client_xafarder;
 
-        ClXafarder(int xPort)
+        public delegate void MissatgeRebutHandler(string missatge);
+        public event MissatgeRebutHandler MissatgeRebut;
+
+        public ClXafarder(FrmMain xFmain,int xPort)
         {
             port = xPort;
+            ConnectarXafarder();
+        }
+        public ClXafarder(FrmMain xFmain,string xPort)
+        {
+            port = Int32.Parse(xPort);
             ConnectarXafarder();
         }
 
         private void ConnectarXafarder()
         {
-            ThXafarder = new Thread(Escoltar);
+            try
+            {
+                xafarder = new TcpListener(IPAddress.Any, port);
+                xafarder.Start();
+                ThXafarder = new Thread(Escoltar);
+                ThXafarder.IsBackground = true;
+                ThXafarder.Start();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
 
         }
 
         private void Escoltar()
         {
-            Int32 nBytes = 0;
-            String xmsg = "";
-            Byte[] xbuffer = new Byte[MAX_BUFFER];                // és on deixarem les dades rebudes
+            const int MAX_BUFFER = 4096;
+            byte[] xbuffer = new byte[MAX_BUFFER];
 
-            do
+            try
             {
-                client_xafarder = xafarder.AcceptTcpClient();         // acceptem un client que vingui d'un altre procés                    
-                while (client_xafarder.Connected)
+                while (true)
                 {
-                    NetworkStream stream = client_xafarder.GetStream();   // obtenim el stream per a llegir el que ens envien
-                    nBytes = stream.Read(xbuffer, 0, xbuffer.Length);
-                    xmsg = Encoding.ASCII.GetString(xbuffer, 0, nBytes);
-                    if (xmsg.Length != 0)
+                    client_xafarder = xafarder.AcceptTcpClient();
+                    NetworkStream stream = client_xafarder.GetStream();
+
+                    int nBytes;
+                    while ((nBytes = stream.Read(xbuffer, 0, xbuffer.Length)) > 0)
                     {
-                        this.Invoke(new delegatMissatge(updText), xmsg);
-                        Array.Clear(xbuffer, 0, xbuffer.Length);
+                        string xmsg = Encoding.UTF8.GetString(xbuffer, 0, nBytes);
+
+                        if (conectado)
+                        {
+                            string[] msgSocket = xmsg.Split(';');
+
+                            if (msgSocket[1] == "PREGUNTA")
+                            {
+                                MissatgeRebut?.Invoke(msgSocket[2]);
+                            }
+                        }
+                        else
+                        {
+                            //leer el S o la N y si es S cambiar a true y activar coso en el main para enseñar el esperando.
+                            if (xmsg == "S")
+                            {
+                                conectado = true;
+                                MissatgeRebut?.Invoke(xmsg);
+                            }
+                        }
                     }
+
+                    client_xafarder.Close();
                 }
-            } while (!(client_xafarder.Connected));
+            }
+            catch (SocketException ex)
+            {
+                Console.WriteLine("Error de socket: " + ex.Message);
+            }
         }
+
     }
 }

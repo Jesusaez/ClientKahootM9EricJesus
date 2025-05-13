@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CLASSES\ClMissatges.cs" />
     <Compile Include="CLASSES\ClSocket.cs" />
     <Compile Include="CLASSES\ClXerraire.cs" />
     <Compile Include="CLASSES\ClXafarder.cs" />
